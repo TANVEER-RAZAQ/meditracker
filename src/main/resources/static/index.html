@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>MediTracker Web Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+        h2 { margin-top: 28px; }
+        fieldset { border: 1px solid #ddd; padding: 16px; margin-bottom: 16px; }
+        label { display: block; margin: 6px 0 4px; }
+        input, select, button { padding: 8px; margin: 4px 0 8px; }
+        .row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .card { border: 1px solid #eee; padding: 12px; border-radius: 8px; }
+        .muted { color: #666; }
+        .ok { color: #0a0; }
+        .err { color: #a00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+<h1>MediTracker Web Demo</h1>
+<p class="muted">Single-page website for the RFID patient flow.</p>
+
+<fieldset>
+    <legend>1) Registration (simulate RFID scan)</legend>
+    <label>RFID UID</label>
+    <input id="rfid" placeholder="e.g. ABCD1234" />
+    <label>Full Name</label>
+    <input id="fullName" placeholder="e.g. Demo Patient" />
+    <button id="btnRegister">Register / Fetch</button>
+    <div id="regResult" class="muted"></div>
+</fieldset>
+
+<fieldset>
+    <legend>2) Start Visit (choose department)</legend>
+    <label>Department</label>
+    <select id="department">
+        <option value="CARDIOLOGY">CARDIOLOGY</option>
+        <option value="GENERAL_MEDICINE">GENERAL_MEDICINE</option>
+        <option value="NEUROLOGY">NEUROLOGY</option>
+        <option value="ORTHOPEDICS">ORTHOPEDICS</option>
+        <option value="PEDIATRICS">PEDIATRICS</option>
+        <option value="DERMATOLOGY">DERMATOLOGY</option>
+    </select>
+    <button id="btnStartVisit">Start Visit</button>
+    <div id="visitResult" class="muted"></div>
+</fieldset>
+
+<fieldset>
+    <legend>3) Vitals (nurse)</legend>
+    <div class="row">
+        <div class="card">
+            <label>Temperature (°C)</label>
+            <input id="temp" type="number" step="0.1" value="36.7" />
+        </div>
+        <div class="card">
+            <label>BP Systolic</label>
+            <input id="bpSys" type="number" value="120" />
+        </div>
+        <div class="card">
+            <label>BP Diastolic</label>
+            <input id="bpDia" type="number" value="80" />
+        </div>
+        <div class="card">
+            <label>Heart Rate</label>
+            <input id="hr" type="number" value="72" />
+        </div>
+    </div>
+    <button id="btnVitals">Record Vitals</button>
+    <div id="vitalsResult" class="muted"></div>
+</fieldset>
+
+<fieldset>
+    <legend>4) Consultation (doctor)</legend>
+    <label>Diagnosis</label>
+    <input id="diagnosis" placeholder="e.g. Mild hypertension" />
+    <label>Medications</label>
+    <input id="meds" placeholder="e.g. MedA 5mg" />
+    <label><input id="needsTests" type="checkbox" /> Tests needed?</label>
+    <button id="btnConsult">Save Consultation</button>
+    <div id="consultResult" class="muted"></div>
+</fieldset>
+
+<fieldset>
+    <legend>5) Lab (optional)</legend>
+    <label>Test Name</label>
+    <input id="testName" placeholder="e.g. CBC" />
+    <label>Price</label>
+    <input id="testPrice" type="number" step="0.01" value="150" />
+    <button id="btnOrderTest">Order Test</button>
+    <button id="btnCompleteTest">Mark Test Completed</button>
+    <div id="labResult" class="muted"></div>
+</fieldset>
+
+<fieldset>
+    <legend>6) Billing</legend>
+    <button id="btnRefreshBills">Refresh Bills</button>
+    <div id="bills"></div>
+</fieldset>
+
+<div id="status" class="muted"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
