@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS visits;
 DROP TABLE IF EXISTS wallets;
 DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
+DROP TABLE IF EXISTS users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Patients
@@ -148,6 +149,31 @@ SELECT
 FROM visits v
          LEFT JOIN billing b ON b.visit_id = v.id
 GROUP BY v.id, v.patient_id, v.doctor_id;
+
+-- Users (for authentication)
+CREATE TABLE users (
+                       id                      BIGINT PRIMARY KEY AUTO_INCREMENT,
+                       username                VARCHAR(50) NOT NULL UNIQUE,
+                       password                VARCHAR(255) NOT NULL,
+                       full_name               VARCHAR(100) NOT NULL,
+                       email                   VARCHAR(100),
+                       phone_number            VARCHAR(20),
+                       role                    VARCHAR(20) NOT NULL,
+                       enabled                 BOOLEAN NOT NULL DEFAULT TRUE,
+                       account_non_expired     BOOLEAN NOT NULL DEFAULT TRUE,
+                       account_non_locked      BOOLEAN NOT NULL DEFAULT TRUE,
+                       credentials_non_expired BOOLEAN NOT NULL DEFAULT TRUE,
+                       patient_id              BIGINT NULL,
+                       doctor_id               BIGINT NULL,
+                       created_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                       CONSTRAINT fk_user_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL,
+                       CONSTRAINT fk_user_doctor  FOREIGN KEY (doctor_id)  REFERENCES doctors(id) ON DELETE SET NULL,
+                       CONSTRAINT chk_user_role CHECK (role IN ('ADMIN','DOCTOR','NURSE','LAB_TECH','BILLING','PATIENT'))
+) ENGINE=InnoDB;
+CREATE INDEX idx_users_username ON users (username);
+CREATE INDEX idx_users_email ON users (email);
+CREATE INDEX idx_users_role ON users (role);
 
 -- Seed one doctor
 INSERT INTO doctors (full_name, department, room_number, floor, consultation_fee)
