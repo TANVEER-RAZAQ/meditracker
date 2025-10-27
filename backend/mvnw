@@ -1,0 +1,72 @@
+#!/bin/sh
+# Apache Maven Wrapper startup script
+# Based on Apache Maven Wrapper 3.2.0
+
+set -euo pipefail
+
+WRAPPER_DIR="$(cd "$(dirname "$0")" && pwd)"
+MVNW_REPOURL=""
+WRAPPER_JAR="$WRAPPER_DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPERTIES="$WRAPPER_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+# Verify properties file exists
+if [ ! -f "$WRAPPER_PROPERTIES" ]; then
+  echo "- ERROR: $WRAPPER_PROPERTIES not found" >&2
+  exit 1
+fi
+
+# Read distribution and wrapper URLs
+DIST_URL=$(sed -n 's/^distributionUrl=\(.*\)$/\1/p' "$WRAPPER_PROPERTIES")
+WRAP_URL=$(sed -n 's/^wrapperUrl=\(.*\)$/\1/p' "$WRAPPER_PROPERTIES")
+
+# Ensure wrapper jar exists; if not, download
+if [ ! -f "$WRAPPER_JAR" ]; then
+  echo "- Downloading Maven Wrapper from: $WRAP_URL"
+  DOWNLOAD_OK=false
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$WRAP_URL" -o "$WRAPPER_JAR" && DOWNLOAD_OK=true
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$WRAP_URL" -O "$WRAPPER_JAR" && DOWNLOAD_OK=true
+  else
+    echo "- ERROR: Need 'curl' or 'wget' to download Maven Wrapper." >&2
+    exit 1
+  fi
+  if [ "$DOWNLOAD_OK" != true ]; then
+    echo "- ERROR: Failed to download Maven Wrapper jar." >&2
+    exit 1
+  fi
+fi
+
+# Prepare Maven distribution
+MVN_DIR="$WRAPPER_DIR/.mvn"
+MAVEN_HOME="$MVN_DIR/apache-maven-3.9.9"
+if [ ! -d "$MAVEN_HOME" ]; then
+  TMP_ZIP="$MVN_DIR/maven-dist.zip"
+  mkdir -p "$MVN_DIR"
+  echo "- Downloading Maven distribution: $DIST_URL"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$DIST_URL" -o "$TMP_ZIP"
+  else
+    wget -q "$DIST_URL" -O "$TMP_ZIP"
+  fi
+  echo "- Extracting Maven distribution"
+  unzip -q "$TMP_ZIP" -d "$MVN_DIR"
+  rm -f "$TMP_ZIP"
+fi
+
+JAVA_CMD="${JAVA_HOME:-}/bin/java"
+if [ ! -x "$JAVA_CMD" ]; then
+  JAVA_CMD="java"
+fi
+
+# JVM opts
+MAVEN_OPTS=${MAVEN_OPTS:-}
+
+# Determine Maven project base directory (where .mvn lives)
+MAVEN_PROJECTBASEDIR="$WRAPPER_DIR"
+
+# Execute Maven WrapperMain which delegates to the real Maven
+exec "$JAVA_CMD" $MAVEN_OPTS \
+  -Dmaven.multiModuleProjectDirectory="$MAVEN_PROJECTBASEDIR" \
+  -classpath "$WRAPPER_JAR" \
+  org.apache.maven.wrapper.MavenWrapperMain "$@"
