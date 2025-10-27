@@ -5,11 +5,13 @@ spring:
     password: meditracker
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
-
 server:
   port: 8080
+springdoc:
+  swagger-ui:
+    path: /swagger
