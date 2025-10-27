@@ -1,0 +1,11 @@
+package com.meditracker.repository;
+
+import com.meditracker.domain.Visit;
+import com.meditracker.domain.enums.VisitStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface VisitRepository extends JpaRepository<Visit, Long> {
+    List<Visit> findByStatus(VisitStatus status);
+}
