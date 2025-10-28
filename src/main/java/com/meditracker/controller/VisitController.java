@@ -33,6 +33,15 @@ public class VisitController {
         List<Visit> visits = visitRepository.findByStatus(status);
         return ResponseEntity.ok(visits);
     }
+    
+    @GetMapping("/active")
+    public ResponseEntity<List<Visit>> getActiveVisits() {
+        // Get all visits that are not completed
+        List<Visit> visits = visitRepository.findAll().stream()
+                .filter(v -> v.getStatus() != VisitStatus.COMPLETED)
+                .toList();
+        return ResponseEntity.ok(visits);
+    }
 
     @PostMapping("/start")
     public ResponseEntity<Visit> start(@Valid @RequestBody StartVisitRequest request) {
