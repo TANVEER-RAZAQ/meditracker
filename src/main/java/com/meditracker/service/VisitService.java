@@ -46,16 +46,20 @@ public class VisitService {
         visit.setDoctor(doctor);
         visit.setDepartment(department);
         visit.setStatus(VisitStatus.REGISTERED);
-        Visit saved = visitRepository.save(visit);
+        Visit saved = visitRepository.saveAndFlush(visit);
 
         Billing billing = new Billing();
         billing.setVisit(saved);
         billing.setType(BillingType.CONSULTATION);
         billing.setItemDescription("Consultation - " + doctor.getFullName());
         billing.setAmount(doctor.getConsultationFee() != null ? doctor.getConsultationFee() : new BigDecimal("300.00"));
-        billingRepository.save(billing);
+        billingRepository.saveAndFlush(billing);
 
-        notificationService.sendToPatient(patient.getId(), "Visit Started", "Assigned to Dr. " + doctor.getFullName());
+        try {
+            notificationService.sendToPatient(patient.getId(), "Visit Started", "Assigned to Dr. " + doctor.getFullName());
+        } catch (Exception e) {
+            // Don't fail visit creation if notification fails
+        }
         return saved;
     }
 
@@ -68,7 +72,7 @@ public class VisitService {
         visit.setBpDiastolic(dia);
         visit.setHeartRate(hr);
         visit.setStatus(VisitStatus.VITALS);
-        return visitRepository.save(visit);
+        return visitRepository.saveAndFlush(visit);
     }
 
     @Transactional
@@ -78,7 +82,7 @@ public class VisitService {
         visit.setDiagnosis(diagnosis);
         visit.setMedications(medications);
         visit.setStatus(testsNeeded ? VisitStatus.LAB_PENDING : VisitStatus.BILLING_PENDING);
-        return visitRepository.save(visit);
+        return visitRepository.saveAndFlush(visit);
     }
 
     @Transactional
@@ -110,17 +114,21 @@ public class VisitService {
         
         // Mark visit as completed
         visit.setStatus(VisitStatus.COMPLETED);
-        visitRepository.save(visit);
+        visitRepository.saveAndFlush(visit);
         
         // Generate and return summary
         VisitSummaryDTO summary = generateVisitSummary(visit);
         
         // Send discharge notification with "Get well soon!" message
-        notificationService.sendDischargeNotification(
-                patient.getId(), 
-                patient.getFullName(), 
-                visit.getDiagnosis()
-        );
+        try {
+            notificationService.sendDischargeNotification(
+                    patient.getId(), 
+                    patient.getFullName(), 
+                    visit.getDiagnosis()
+            );
+        } catch (Exception e) {
+            // Don't fail discharge if notification fails
+        }
         
         return summary;
     }

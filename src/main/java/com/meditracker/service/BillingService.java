@@ -54,11 +54,15 @@ public class BillingService {
         wallet.setBalance(balance.subtract(bill.getAmount()));
         bill.setStatus(BillingStatus.PAID);
         bill.setPaidAt(LocalDateTime.now());
-        walletRepository.save(wallet);
-        billingRepository.save(bill);
+        walletRepository.saveAndFlush(wallet);
+        billingRepository.saveAndFlush(bill);
 
-        notificationService.sendToPatient(patient.getId(), "Payment Success",
-                "Paid " + bill.getAmount() + " for " + bill.getItemDescription());
+        try {
+            notificationService.sendToPatient(patient.getId(), "Payment Success",
+                    "Paid " + bill.getAmount() + " for " + bill.getItemDescription());
+        } catch (Exception e) {
+            // Don't fail payment if notification fails
+        }
 
         Visit visit = bill.getVisit();
         boolean anyUnpaid = billingRepository.findByVisit(visit).stream()
@@ -66,8 +70,12 @@ public class BillingService {
         boolean anyPendingLab = false; // simplified
         if (!anyUnpaid && !anyPendingLab) {
             visit.setStatus(com.meditracker.domain.enums.VisitStatus.COMPLETED);
-            visitRepository.save(visit);
-            notificationService.sendToPatient(patient.getId(), "Visit Completed", "Thank you for visiting.");
+            visitRepository.saveAndFlush(visit);
+            try {
+                notificationService.sendToPatient(patient.getId(), "Visit Completed", "Thank you for visiting.");
+            } catch (Exception e) {
+                // Don't fail if notification fails
+            }
         }
     }
 

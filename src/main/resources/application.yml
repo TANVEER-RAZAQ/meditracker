@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:meditracker;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:file:./meditracker-db;MODE=MySQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password: ''
@@ -10,7 +10,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 0
     open-in-view: false
+    show-sql: true
+  transaction:
+    default-timeout: 30
   h2:
     console:
       enabled: true

@@ -1,4 +1,5 @@
 package com.meditracker.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.meditracker.domain.base.Auditable;
 import com.meditracker.domain.enums.LabTestStatus;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ public class LabTest extends Auditable {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JsonBackReference("visit-labtests")
     private Visit visit;
 
     @Column(nullable = false, length = 120)

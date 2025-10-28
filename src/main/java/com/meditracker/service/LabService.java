@@ -37,14 +37,14 @@ public class LabService {
         test.setTestName(testName);
         test.setPrice(price);
         test.setStatus(LabTestStatus.ORDERED);
-        LabTest saved = labTestRepository.save(test);
+        LabTest saved = labTestRepository.saveAndFlush(test);
 
         Billing bill = new Billing();
         bill.setVisit(visit);
         bill.setType(com.meditracker.domain.enums.BillingType.LAB_TEST);
         bill.setItemDescription("Lab Test - " + testName);
         bill.setAmount(price);
-        billingRepository.save(bill);
+        billingRepository.saveAndFlush(bill);
 
         return saved;
     }
@@ -57,9 +57,13 @@ public class LabService {
         if (status == LabTestStatus.COMPLETED) {
             labTest.setCompletedAt(LocalDateTime.now());
             labTest.setResultText(resultText);
-            notificationService.sendToPatient(labTest.getVisit().getPatient().getId(),
-                    "Test Results Ready", labTest.getTestName() + " results are available.");
+            try {
+                notificationService.sendToPatient(labTest.getVisit().getPatient().getId(),
+                        "Test Results Ready", labTest.getTestName() + " results are available.");
+            } catch (Exception e) {
+                // Don't fail if notification fails
+            }
         }
-        return labTestRepository.save(labTest);
+        return labTestRepository.saveAndFlush(labTest);
     }
 }

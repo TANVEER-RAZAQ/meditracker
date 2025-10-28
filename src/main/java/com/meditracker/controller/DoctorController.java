@@ -50,7 +50,7 @@ public class DoctorController {
         doctor.setConsultationFee(request.getConsultationFee() != null ? 
                 request.getConsultationFee() : new BigDecimal("300.00"));
         
-        Doctor saved = doctorRepository.save(doctor);
+        Doctor saved = doctorRepository.saveAndFlush(doctor);
         return ResponseEntity.ok(saved);
     }
 
@@ -68,7 +68,7 @@ public class DoctorController {
             doctor.setConsultationFee(request.getConsultationFee());
         }
         
-        Doctor updated = doctorRepository.save(doctor);
+        Doctor updated = doctorRepository.saveAndFlush(doctor);
         return ResponseEntity.ok(updated);
     }
 

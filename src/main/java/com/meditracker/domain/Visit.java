@@ -1,4 +1,5 @@
 package com.meditracker.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.meditracker.domain.base.Auditable;
 import com.meditracker.domain.enums.Department;
 import com.meditracker.domain.enums.VisitStatus;
@@ -13,9 +14,11 @@ public class Visit extends Auditable {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JsonBackReference("patient-visits")
     private Patient patient;
 
     @ManyToOne(optional = false)
+    @JsonBackReference("doctor-visits")
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)

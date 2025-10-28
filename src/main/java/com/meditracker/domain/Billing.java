@@ -1,4 +1,5 @@
 package com.meditracker.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.meditracker.domain.base.Auditable;
 import com.meditracker.domain.enums.BillingStatus;
 import com.meditracker.domain.enums.BillingType;
@@ -15,6 +16,7 @@ public class Billing extends Auditable {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JsonBackReference("visit-billings")
     private Visit visit;
 
     @Enumerated(EnumType.STRING)

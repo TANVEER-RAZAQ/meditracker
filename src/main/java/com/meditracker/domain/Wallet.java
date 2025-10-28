@@ -1,4 +1,5 @@
 package com.meditracker.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.meditracker.domain.base.Auditable;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ public class Wallet extends Auditable {
 
     @OneToOne(optional = false)
     @JoinColumn(name = "patient_id", nullable = false, unique = true)
+    @JsonBackReference("patient-wallet")
     private Patient patient;
 
     @Column(nullable = false, precision = 14, scale = 2)
