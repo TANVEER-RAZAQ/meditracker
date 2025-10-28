@@ -2,6 +2,7 @@ package com.meditracker.controller;
 
 import com.meditracker.controller.dto.*;
 import com.meditracker.domain.Visit;
+import com.meditracker.domain.enums.Department;
 import com.meditracker.domain.enums.VisitStatus;
 import com.meditracker.repository.VisitRepository;
 import com.meditracker.service.VisitService;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/visits")
@@ -35,11 +37,22 @@ public class VisitController {
     }
     
     @GetMapping("/active")
-    public ResponseEntity<List<Visit>> getActiveVisits() {
-        // Get all visits that are not completed
-        List<Visit> visits = visitRepository.findAll().stream()
+    public ResponseEntity<List<ActiveVisitDTO>> getActiveVisits() {
+        // Get all visits that are not completed and convert to DTO
+        List<ActiveVisitDTO> visits = visitRepository.findAll().stream()
                 .filter(v -> v.getStatus() != VisitStatus.COMPLETED)
-                .toList();
+                .map(ActiveVisitDTO::fromVisit)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(visits);
+    }
+    
+    @GetMapping("/department/{department}")
+    public ResponseEntity<List<ActiveVisitDTO>> getVisitsByDepartment(@PathVariable Department department) {
+        // Get all active visits for a specific department
+        List<ActiveVisitDTO> visits = visitRepository.findByDepartmentAndStatusNot(department, VisitStatus.COMPLETED)
+                .stream()
+                .map(ActiveVisitDTO::fromVisit)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(visits);
     }
 

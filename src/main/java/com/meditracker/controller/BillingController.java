@@ -20,6 +20,14 @@ public class BillingController {
         billingService.payWithRfid(request.getRfidUid(), request.getBillingId());
         return ResponseEntity.ok().build();
     }
+    
+    @PostMapping("/pay/visit")
+    public ResponseEntity<Void> payVisitBills(@RequestBody java.util.Map<String, Object> request) {
+        String rfidUid = (String) request.get("rfidUid");
+        Long visitId = ((Number) request.get("visitId")).longValue();
+        billingService.payVisitBills(rfidUid, visitId);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/visit/{visitId}")
     public ResponseEntity<List<Billing>> byVisit(@PathVariable Long visitId) {
